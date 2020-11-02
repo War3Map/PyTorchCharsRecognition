@@ -194,7 +194,7 @@ criterion = nn.NLLLoss()
 #задаём остальные параметры
 batch_size=10000
 learning_rate=0.01
-epochs=20
+epochs=10
 #(train_loader,test_loader) 
 train_data,test_data = load_traindata(batch_size)
 # a=5
