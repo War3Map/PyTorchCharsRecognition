@@ -147,10 +147,11 @@ def test_nn(net,test_loader,device):
            correct += pred.eq(labels.data).sum()
     
     test_loss /= len(test_loader.dataset)
+    test_acc = float( 100. * correct / len(test_loader.dataset))
     print('Test set: Average loss: {:.4f}, Accuracy: {}/{} ({:.2f}%)'.format(
            test_loss, correct, len(test_loader.dataset),
-           100. * correct / len(test_loader.dataset)))
-    return test_loss
+           test_acc))
+    return test_acc
  
 def graphics_show_loss_acc(losses, accuraces,save_file):
     epochs_count=len(losses)
@@ -216,9 +217,6 @@ def save_stats(accuraces,losses,save_file):
             file.write("{}:{}\n".format(accuraces[i],losses[i]))
     
     
-#    
-#    axs[1].plot(epochs)
-#    axs[1].set_title("Train Epoch")
 
 #функции потерь на каждой эпохе
 epoch_losses=list()
@@ -228,8 +226,9 @@ acc_list=list()
 model_path="CNN_EMNIST_model";
 modelsave_exists=os.path.isfile(model_path)
 
-#веса
-
+DATASET="EMNIST"
+OPTIMIZER="Adam"
+NETWORK_TYPE="CNN"
 
 #Назначаем устройство на котором будет работать нейросеть, по возможности CUDA
 dev = "cuda" if torch.cuda.is_available() else "cpu"  
@@ -277,23 +276,26 @@ start_time = time.time()
 # обучение сети
 train_net(net,train_data,optimizer,criterion,device, epoch_losses,acc_list)
 train_time = time.time() - start_time
-msg = "Train time: %s secs (Wall clock time)" % timedelta(seconds=round(train_time))
-print(msg)  
+train_time_str = str(timedelta(seconds=round(train_time)))
+print("Train time: %s secs (Wall clock time)" % timedelta(seconds=round(train_time)))  
 #тест результатов обучения сети
 start_time = time.time()
 avg_test_acc=test_nn(net,test_data,device)
-
+print(avg_test_acc)
 test_time = time.time() - start_time
-msg = "Test time: %s secs (Wall clock time)" % timedelta(seconds=round(test_time))
-print(msg)  
-
-result_file = "CNN_{}({},ep={},acc={},train={},test={}).txt".format("EMNIST","Adam",epochs,
-                                                     avg_test_acc,train_time,
-                                                     test_time)
+test_time_str = str(timedelta(seconds=round(test_time)))
+print("Test time: %s secs (Wall clock time)" % timedelta(seconds=round(test_time))) 
+#время тестирования
+time=(train_time_str,test_time_str) 
+result_file = "{}_{}(op={},ep={},acc={:.3f})".format(NETWORK_TYPE,
+                                               DATASET,
+                                               OPTIMIZER,
+                                               epochs,
+                                               avg_test_acc)
 #строим график обучения
-graphics_show_loss_acc(epoch_losses, acc_list, result_file)
+graphics_show_loss_acc(epoch_losses, acc_list, result_file+".png")
 #Сохраняем результаты в файл
-save_stats(acc_list,epoch_losses,result_file)
+save_stats(acc_list,epoch_losses,time,result_file+".txt")
 
 
 

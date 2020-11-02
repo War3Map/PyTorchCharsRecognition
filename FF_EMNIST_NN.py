@@ -136,9 +136,11 @@ def test_nn(net,test_loader,device):
            correct += pred.eq(target.data).sum()
     
     test_loss /= len(test_loader.dataset)
+    test_acc = float( 100. * correct / len(test_loader.dataset))
     print('Test set: Average loss: {:.4f}, Accuracy: {}/{} ({:.2f}%)'.format(
            test_loss, correct, len(test_loader.dataset),
-           100. * correct / len(test_loader.dataset)))
+           test_acc))
+    return test_acc
  
 def graphics_show_loss_acc(losses, accuraces):
     epochs_count=len(losses)
@@ -195,10 +197,13 @@ def graphics_show_loss_acc(losses, accuraces):
     plt.show()
     
     
-#    
-#    axs[1].plot(epochs)
-#    axs[1].set_title("Train Epoch")
-
+#Сохраняет статистику в файл
+def save_stats(accuraces,losses,common_time,save_file):    
+    with open(save_file, "w+") as file:
+        file.write("Train:{}\nTest:{}\n".format(common_time[0],common_time[1]))        
+        epochs_count=len(accuraces)
+        for i in range(0,epochs_count):
+            file.write("{}:{}\n".format(accuraces[i],losses[i]))
 #функции потерь на каждой эпохе
 epoch_losses=list()
 #список значений точности на каждой эпохе
@@ -207,8 +212,9 @@ acc_list=list()
 model_path="FFNN_EMNIST_model";
 modelsave_exists=os.path.isfile(model_path)
 
-#веса
-
+DATASET="EMNIST"
+OPTIMIZER="Adam"
+NETWORK_TYPE="FFNN"
 
 #Назначаем устройство на котором будет работать нейросеть, по возможности CUDA
 dev = "cuda" if torch.cuda.is_available() else "cpu"  
@@ -240,7 +246,7 @@ optimizer = optim.Adam(net.parameters(), lr=learning_rate)
 criterion = nn.NLLLoss()
 
 #задаём остальные параметры
-batch_size=1000
+batch_size=10000
 learning_rate=0.01
 epochs=20
 #(train_loader,test_loader) 
@@ -254,15 +260,27 @@ start_time = time.time()
 
 # обучение сети
 train_net(net,train_data,optimizer,criterion,device, epoch_losses,acc_list)
-
-graphics_show_loss_acc(epoch_losses, acc_list)
-
-test_nn(net,test_data,device)
-
-
-elapsed_time_secs = time.time() - start_time
-msg = "Execution took: %s secs (Wall clock time)" % timedelta(seconds=round(elapsed_time_secs))
-print(msg)  
+train_time = time.time() - start_time
+train_time_str = str(timedelta(seconds=round(train_time)))
+print("Train time: %s secs (Wall clock time)" % timedelta(seconds=round(train_time)))  
+#тест результатов обучения сети
+start_time = time.time()
+avg_test_acc=test_nn(net,test_data,device)
+print(avg_test_acc)
+test_time = time.time() - start_time
+test_time_str = str(timedelta(seconds=round(test_time)))
+print("Test time: %s secs (Wall clock time)" % timedelta(seconds=round(test_time))) 
+#время тестирования
+time=(train_time_str,test_time_str) 
+result_file = "{}_{}(op={},ep={},acc={:.3f})".format(NETWORK_TYPE,
+                                               DATASET,
+                                               OPTIMIZER,
+                                               epochs,
+                                               avg_test_acc)
+#строим график обучения
+graphics_show_loss_acc(epoch_losses, acc_list, result_file+".png")
+#Сохраняем результаты в файл
+save_stats(acc_list,epoch_losses,time,result_file+".txt")
 
 if (not modelsave_exists):
     torch.save(net.state_dict(),model_path)
