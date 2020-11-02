@@ -24,7 +24,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 
 
-DATA_PATH='../data'
+DATAPATH='../dataMNIST'
 
 # Объявим класс для нашей нейронной сети
 class Net(nn.Module):

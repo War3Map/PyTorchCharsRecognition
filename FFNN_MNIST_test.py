@@ -17,7 +17,7 @@ import matplotlib.ticker as ticker
 
 
 
-
+DATAPATH='../dataMNIST'
 
 # Объявим класс для нашей нейронной сети
 class Net(nn.Module):
@@ -57,11 +57,11 @@ def  load_traindata(batch_size):
                                           transforms.Normalize((0.1307,), (0.3081,)) ])    
     
     train_loader = torch.utils.data.DataLoader(
-                   datasets.MNIST('../data', train=True, download=True,transform=transformations),
+                   datasets.MNIST(DATAPATH, train=True, download=True,transform=transformations),
                    batch_size=batch_size, shuffle=True,pin_memory=True)         
     
     labels_loader = torch.utils.data.DataLoader(
-                    datasets.MNIST('../data', train=False, download=False,transform=transformations),
+                    datasets.MNIST(DATAPATH, train=False, download=False,transform=transformations),
                     batch_size=batch_size, shuffle=True,pin_memory=True)  
     
     return (train_loader,labels_loader)
