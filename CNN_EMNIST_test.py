@@ -24,7 +24,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 
 
-DATAPATH='../dataMNIST'
+DATAPATH='../dataEMNIST'
 
 # Объявим класс для нашей нейронной сети
 class Net(nn.Module):
@@ -33,14 +33,14 @@ class Net(nn.Module):
        self.device=device
        #определяем слои нейросети
        self.Conv1 = nn.Sequential( 
-            nn.Conv2d(1, 4, kernel_size=5, stride=1, padding=2), 
+            nn.Conv2d(1, 16, kernel_size=5, stride=1, padding=2), 
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2, stride=2)) 
        self.Conv2 = nn.Sequential( 
-            nn.Conv2d(4, 16, kernel_size=5, stride=1, padding=2), 
+            nn.Conv2d(16, 32, kernel_size=5, stride=1, padding=2), 
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2, stride=2))
-       self.fc3 = nn.Linear(7*7*16, 10).to(device)
+       self.fc3 = nn.Linear(7*7*32, 62).to(device)
        
        
        # self.fc1 = nn.Linear(28 * 28, 200).to("cuda:0")
@@ -71,11 +71,11 @@ def  load_traindata(batch_size):
                                           transforms.Normalize((0.1307,), (0.3081,)) ])    
     
     train_loader = torch.utils.data.DataLoader(
-                   datasets.MNIST(DATA_PATH, train=True, download=True,transform=transformations),
+                   datasets.EMNIST(DATAPATH,split="byclass" , train=True, download=True,transform=transformations),
                    batch_size=batch_size, shuffle=True,pin_memory=True)         
     
     labels_loader = torch.utils.data.DataLoader(
-                    datasets.MNIST(DATA_PATH, train=False, download=False,transform=transformations),
+                    datasets.EMNIST(DATAPATH,split="byclass", train=False, download=False,transform=transformations),
                     batch_size=batch_size, shuffle=True,pin_memory=True)  
     
     return (train_loader,labels_loader)
@@ -216,7 +216,7 @@ epoch_losses=list()
 #список значений точности на каждой эпохе
 acc_list=list()
 
-model_path="modelCNNmnist";
+model_path="CNN_EMNIST_model";
 modelsave_exists=os.path.isfile(model_path)
 
 #веса
@@ -240,7 +240,7 @@ if (modelsave_exists):
 
 
 #скорость обучения
-learning_rate=0.01
+learning_rate=0.001
 # Создаём оптимизатор- метод градиентного спуска, параметры learning_rate,momentum
 #optimizer = optim.SGD(net.parameters(), lr=learning_rate, momentum=0.9)
 #optimizer = optim.Adagrad(net.parameters(), lr=learning_rate)
