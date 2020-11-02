@@ -118,7 +118,7 @@ def test_nn(net,test_loader,device):
     #тестирование
     test_loss = 0
     correct = 0
-    
+    test_acc=0
     with torch.no_grad():
         for data, target in test_loader:
            data, target = data.to(device), target.to(device)
@@ -131,9 +131,11 @@ def test_nn(net,test_loader,device):
            correct += pred.eq(target.data).sum()
     
     test_loss /= len(test_loader.dataset)
+    test_acc = float( 100. * correct / len(test_loader.dataset))
     print('Test set: Average loss: {:.4f}, Accuracy: {}/{} ({:.2f}%)'.format(
            test_loss, correct, len(test_loader.dataset),
-           100. * correct / len(test_loader.dataset)))
+           test_acc))
+    return test_acc
  
 def graphics_show_loss_acc(losses, accuraces,save_file):
     epochs_count=len(losses)
@@ -244,7 +246,7 @@ criterion = nn.NLLLoss()
 #задаём остальные параметры
 batch_size=10000
 learning_rate=0.01
-epochs=1
+epochs=10
 
 #(train_loader,test_loader) 
 train_data,test_data = load_traindata(batch_size)
@@ -263,13 +265,13 @@ print("Train time: %s secs (Wall clock time)" % timedelta(seconds=round(train_ti
 #тест результатов обучения сети
 start_time = time.time()
 avg_test_acc=test_nn(net,test_data,device)
-
+print(avg_test_acc)
 test_time = time.time() - start_time
 test_time_str = str(timedelta(seconds=round(test_time)))
 print("Test time: %s secs (Wall clock time)" % timedelta(seconds=round(test_time))) 
 #время тестирования
 time=(train_time_str,test_time_str) 
-result_file = "{}_{}({},ep={},acc={.})".format(NETWORK_TYPE,
+result_file = "{}_{}(op={},ep={},acc={:.3f})".format(NETWORK_TYPE,
                                                DATASET,
                                                OPTIMIZER,
                                                epochs,
