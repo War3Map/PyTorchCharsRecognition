@@ -150,8 +150,9 @@ def test_nn(net,test_loader,device):
     print('Test set: Average loss: {:.4f}, Accuracy: {}/{} ({:.2f}%)'.format(
            test_loss, correct, len(test_loader.dataset),
            100. * correct / len(test_loader.dataset)))
+    return test_loss
  
-def graphics_show_loss_acc(losses, accuraces):
+def graphics_show_loss_acc(losses, accuraces,save_file):
     epochs_count=len(losses)
     epochs=[x+1 for x in range(epochs_count) ]
     for i in range(0,epochs_count):
@@ -205,6 +206,14 @@ def graphics_show_loss_acc(losses, accuraces):
 
     plt.subplots_adjust(hspace=0.5)
     plt.show()
+    fig.savefig(save_file)
+
+#Сохраняет статистику в файл
+def save_stats(accuraces,losses,save_file):    
+    with open(save_file, "w+") as file:
+        epochs_count=len(accuraces)
+        for i in range(0,epochs_count):
+            file.write("{}:{}\n".format(accuraces[i],losses[i]))
     
     
 #    
@@ -267,17 +276,26 @@ start_time = time.time()
 
 # обучение сети
 train_net(net,train_data,optimizer,criterion,device, epoch_losses,acc_list)
-
-graphics_show_loss_acc(epoch_losses, acc_list)
-
-test_nn(net,test_data,device)
-
-
-elapsed_time_secs = time.time() - start_time
-
-msg = "Execution took: %s secs (Wall clock time)" % timedelta(seconds=round(elapsed_time_secs))
-
+train_time = time.time() - start_time
+msg = "Train time: %s secs (Wall clock time)" % timedelta(seconds=round(train_time))
 print(msg)  
+#тест результатов обучения сети
+start_time = time.time()
+avg_test_acc=test_nn(net,test_data,device)
+
+test_time = time.time() - start_time
+msg = "Test time: %s secs (Wall clock time)" % timedelta(seconds=round(test_time))
+print(msg)  
+
+result_file = "CNN_{}({},ep={},acc={},train={},test={}).txt".format("EMNIST","Adam",epochs,
+                                                     avg_test_acc,train_time,
+                                                     test_time)
+#строим график обучения
+graphics_show_loss_acc(epoch_losses, acc_list, result_file)
+#Сохраняем результаты в файл
+save_stats(acc_list,epoch_losses,result_file)
+
+
 
 if (not modelsave_exists):
     torch.save(net.state_dict(),model_path)

@@ -240,7 +240,7 @@ optimizer = optim.Adam(net.parameters(), lr=learning_rate)
 criterion = nn.NLLLoss()
 
 #задаём остальные параметры
-batch_size=10000
+batch_size=1000
 learning_rate=0.01
 epochs=20
 #(train_loader,test_loader) 
