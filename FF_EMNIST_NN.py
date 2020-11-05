@@ -62,7 +62,7 @@ class Net(nn.Module):
 
 def  load_traindata(batch_size):    
     transformations = transforms.Compose([transforms.ToTensor(),
-                                          transforms.Normalize((0.1722,), (0.3310,)) ])    
+                                          transforms.Normalize((0.1736,), (0.3317,)) ])    
     
     train_loader = torch.utils.data.DataLoader(
                    datasets.EMNIST(DATAPATH,split='byclass', train=True, download=True,transform=transformations),

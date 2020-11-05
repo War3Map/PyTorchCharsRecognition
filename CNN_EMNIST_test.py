@@ -41,7 +41,8 @@ class Net(nn.Module):
             nn.Conv2d(16, 32, kernel_size=5, stride=1, padding=2), 
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2, stride=2))
-       self.fc3 = nn.Linear(7*7*32, 62).to(device)
+       self.fc1 = nn.Linear(7*7*32, 200).to(device)
+       self.fc2 = nn.Linear(200, 62).to(device)
        
        
        # self.fc1 = nn.Linear(28 * 28, 200).to("cuda:0")
@@ -58,7 +59,8 @@ class Net(nn.Module):
        x = self.Conv1(x).to(self.device)
        x = self.Conv2(x).to(self.device)
        x = x.reshape(x.size(0), -1)
-       x = self.fc3(x).to(self.device)
+       x = self.fc1(x).to(self.device)
+       x = self.fc2(x).to(self.device)
        return F.log_softmax(x).to(self.device)
       #вывод архитектуры нейросети
     def printNet(self):
@@ -69,7 +71,7 @@ class Net(nn.Module):
 
 def  load_traindata(batch_size):    
     transformations = transforms.Compose([transforms.ToTensor(),
-                                          transforms.Normalize((0.1307,), (0.3081,)) ])    
+                                          transforms.Normalize((0.1736,), (0.3317,)) ])    
     
     train_loader = torch.utils.data.DataLoader(
                    datasets.EMNIST(DATAPATH,split="byclass" , train=True, download=True,transform=transformations),
