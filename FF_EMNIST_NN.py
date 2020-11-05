@@ -180,7 +180,7 @@ if (modelsave_exists):
 
 
 #скорость обучения
-learning_rate=0.01
+learning_rate=0.001
 # Создаём оптимизатор- метод градиентного спуска, параметры learning_rate,momentum
 #optimizer = optim.SGD(net.parameters(), lr=learning_rate, momentum=0.9)
 #optimizer = optim.Adagrad(net.parameters(), lr=learning_rate)

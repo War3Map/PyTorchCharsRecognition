@@ -157,8 +157,9 @@ def test_nn(net,test_loader,device):
 
 
 #Сохраняет статистику в файл
-def save_stats(accuraces,losses,save_file):    
+def save_stats(accuraces,losses,common_time,save_file):    
     with open(save_file, "w+") as file:
+        file.write("Train:{}\nTest:{}\n".format(common_time[0],common_time[1]))        
         epochs_count=len(accuraces)
         for i in range(0,epochs_count):
             file.write("{}:{}\n".format(accuraces[i],losses[i]))
@@ -207,7 +208,7 @@ optimizer = optim.Adam(net.parameters(), lr=learning_rate)
 criterion = nn.NLLLoss()
 
 #задаём остальные параметры
-batch_size=100
+batch_size=400
 learning_rate=0.001
 epochs=15
 
