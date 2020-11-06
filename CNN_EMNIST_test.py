@@ -34,14 +34,14 @@ class Net(nn.Module):
        self.device=device
        #определяем слои нейросети
        self.Conv1 = nn.Sequential( 
-            nn.Conv2d(1, 16, kernel_size=5, stride=1, padding=2), 
+            nn.Conv2d(1, 32, kernel_size=5, stride=1, padding=2), 
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2, stride=2)) 
        self.Conv2 = nn.Sequential( 
-            nn.Conv2d(16, 32, kernel_size=5, stride=1, padding=2), 
+            nn.Conv2d(32, 64, kernel_size=5, stride=1, padding=2), 
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2, stride=2))
-       self.fc1 = nn.Linear(7*7*32, 200).to(device)
+       self.fc1 = nn.Linear(7*7*64, 200).to(device)
        self.fc2 = nn.Linear(200, 62).to(device)
        
        
