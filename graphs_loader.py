@@ -88,4 +88,4 @@ def graphics_show_loss_acc(saved_file,epmin=1,epmax=20,
 
 print("Input Report Filename:")
 saved_file=str(input())
-graphics_show_loss_acc(saved_file,epmax=16,lossmax=2,accmin=0.7)
+graphics_show_loss_acc(saved_file,epmax=20,lossmax=1,accmin=0.7)
