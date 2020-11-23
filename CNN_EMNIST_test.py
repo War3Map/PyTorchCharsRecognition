@@ -34,16 +34,20 @@ class Net(nn.Module):
        self.device=device
        #определяем слои нейросети
        self.Conv1 = nn.Sequential( 
-            nn.Conv2d(1, 32, kernel_size=5, stride=1, padding=2), 
+            nn.Conv2d(1, 16, kernel_size=5, stride=1, padding=2), 
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2, stride=2)) 
        self.Conv2 = nn.Sequential( 
+            nn.Conv2d(16, 32, kernel_size=5, stride=1, padding=2), 
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2))
+       self.Conv3 = nn.Sequential( 
             nn.Conv2d(32, 64, kernel_size=5, stride=1, padding=2), 
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2, stride=2))
-       self.fc1 = nn.Linear(7*7*64, 200).to(device)
-       self.fc2 = nn.Linear(200, 62).to(device)
-       
+       self.fc1 = nn.Linear(3*3*64, 200).to(device)
+       self.fc2 = nn.Linear(200, 200).to(device)
+       self.fc3 = nn.Linear(200, 62).to(device)
        
        # self.fc1 = nn.Linear(28 * 28, 200).to("cuda:0")
        # self.fc2 = nn.Linear(200, 200).to("cuda:0")
@@ -58,9 +62,11 @@ class Net(nn.Module):
     def forward(self, x):
        x = self.Conv1(x).to(self.device)
        x = self.Conv2(x).to(self.device)
+       x = self.Conv3(x).to(self.device)
        x = x.reshape(x.size(0), -1)
-       x = self.fc1(x).to(self.device)
-       x = self.fc2(x).to(self.device)
+       x = F.relu(self.fc1(x)).to(self.device)
+       x = F.relu(self.fc2(x)).to(self.device)
+       x = self.fc3(x).to(self.device)
        return F.log_softmax(x).to(self.device)
       #вывод архитектуры нейросети
     def printNet(self):
@@ -71,7 +77,7 @@ class Net(nn.Module):
 
 def  load_traindata(batch_size):    
     transformations = transforms.Compose([transforms.ToTensor(),
-                                          transforms.Normalize((0.1736,), (0.3317,)) ])    
+                                          transforms.Normalize((0.1307,), (0.3081,)) ])    
     
     train_loader = torch.utils.data.DataLoader(
                    datasets.EMNIST(DATAPATH,split="byclass" , train=True, download=True,transform=transformations),
@@ -159,9 +165,9 @@ def test_nn(net,test_loader,device):
 
 
 #Сохраняет статистику в файл
-def save_stats(accuraces,losses,common_time,save_file):    
+def save_stats(accuraces,losses, common_time, save_file):    
     with open(save_file, "w+") as file:
-        file.write("Train:{}\nTest:{}\n".format(common_time[0],common_time[1]))        
+        file.write("Train:{}\nTest:{}\n".format(common_time[0],common_time[1]))
         epochs_count=len(accuraces)
         for i in range(0,epochs_count):
             file.write("{}:{}\n".format(accuraces[i],losses[i]))
@@ -210,9 +216,9 @@ optimizer = optim.Adam(net.parameters(), lr=learning_rate)
 criterion = nn.NLLLoss()
 
 #задаём остальные параметры
-batch_size=400
+batch_size=1000
 learning_rate=0.001
-epochs=15
+epochs=20
 
 #(train_loader,test_loader) 
 train_data,test_data = load_traindata(batch_size)

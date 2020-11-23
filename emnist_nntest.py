@@ -56,7 +56,7 @@ class Net(nn.Module):
 
 def  load_traindata(batch_size):    
         train_loader = torch.utils.data.DataLoader(
-        datasets.EMNIST('../dataEMNIST',split="byclass", train=True, download=True,
+        datasets.EMNIST('../dataEMNIST',split="letters", train=True, download=True,
             transform=transforms.ToTensor()),                 
             batch_size=batch_size, shuffle=True,pin_memory=True)
         

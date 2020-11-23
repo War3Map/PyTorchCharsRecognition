@@ -47,7 +47,7 @@ def graphics_show_loss_acc(losses, accuraces,save_file):
         color = 'gray',
         linestyle = ':')
     axes[1].set_ylim(0.5, 1.0)
-    axes[1].set_xlim(0, 16)
+    axes[1].set_xlim(0, 20)
     
     axes[1].set_xlabel("Epochs") # ось абсцисс
     axes[1].set_ylabel("Accuraces") # ось ординат

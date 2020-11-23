@@ -62,7 +62,7 @@ class Net(nn.Module):
 
 def  load_traindata(batch_size):    
     transformations = transforms.Compose([transforms.ToTensor(),
-                                          transforms.Normalize((0.1736,), (0.3317,)) ])    
+                                          transforms.Normalize((0.1722,), (0.3310,)) ])    
     
     train_loader = torch.utils.data.DataLoader(
                    datasets.EMNIST(DATAPATH,split='byclass', train=True, download=True,transform=transformations),
@@ -180,7 +180,7 @@ if (modelsave_exists):
 
 
 #скорость обучения
-learning_rate=0.001
+learning_rate=0.01
 # Создаём оптимизатор- метод градиентного спуска, параметры learning_rate,momentum
 #optimizer = optim.SGD(net.parameters(), lr=learning_rate, momentum=0.9)
 #optimizer = optim.Adagrad(net.parameters(), lr=learning_rate)
@@ -194,7 +194,7 @@ criterion = nn.NLLLoss()
 #задаём остальные параметры
 batch_size=10000
 learning_rate=0.01
-epochs=10
+epochs=20
 #(train_loader,test_loader) 
 train_data,test_data = load_traindata(batch_size)
 # a=5
