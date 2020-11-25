@@ -72,6 +72,10 @@ def  load_traindata(batch_size):
                     datasets.EMNIST(DATAPATH,split='byclass', train=False, download=False,transform=transformations),
                     batch_size=batch_size, shuffle=True,pin_memory=True)  
     
+    dataset_test_len = len(test_loader.dataset)
+    dataset_train_len = len(train_loader.dataset)
+    print("Длина обучающего датасета {}\n Длина трениро"\
+          "вочного датасета\n".format(dataset_train_len, dataset_test_len))
     return (train_loader,test_loader)
     
     
