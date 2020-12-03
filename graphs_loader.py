@@ -49,9 +49,9 @@ def graphics_show_loss_acc(saved_file,epmin=1,epmax=20,
     axes[0].set_ylim(lossmin, lossmax)
     axes[0].set_xlim(epmin, epmax)
     
-    axes[0].set_xlabel("Epochs") # ось абсцисс
-    axes[0].set_ylabel("Losses") # ось ординат
-    axes[0].set_title("Train Loss")    
+    axes[0].set_xlabel("Эпоха") # ось абсцисс
+    axes[0].set_ylabel("Функция потерь") # ось ординат
+    axes[0].set_title("Значение функции потерь при обучении")    
     
     axes[0].xaxis.set_major_locator(ticker.MultipleLocator(2))
     axes[0].xaxis.set_minor_locator(ticker.MultipleLocator(1))
@@ -70,9 +70,9 @@ def graphics_show_loss_acc(saved_file,epmin=1,epmax=20,
     axes[1].set_ylim(accmin, accmax)
     axes[1].set_xlim(epmin, epmax)
     
-    axes[1].set_xlabel("Epochs") # ось абсцисс
-    axes[1].set_ylabel("Accuraces") # ось ординат
-    axes[1].set_title("Train Accuraces")
+    axes[1].set_xlabel("Эпоха") # ось абсцисс
+    axes[1].set_ylabel("Точность распознавания") # ось ординат
+    axes[1].set_title("Значение средней точности распознавания при обучении")
    
     
     axes[1].xaxis.set_major_locator(ticker.MultipleLocator(2))
@@ -87,5 +87,5 @@ def graphics_show_loss_acc(saved_file,epmin=1,epmax=20,
     
 
 print("Input Report Filename:")
-saved_file=str(input())
+saved_file=str(input()).strip('"')
 graphics_show_loss_acc(saved_file,epmax=20,lossmax=1,accmin=0.7)
