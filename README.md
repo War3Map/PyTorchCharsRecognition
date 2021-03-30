@@ -2,24 +2,39 @@
 
 Testing Neural Networks work with PyToch
 
+## Requirements
+
+- PyToch
+- matploitlib
+
+
+## Run
+
+```
+python test_network
+```
+
 Structure :
 
-- CNNTest.py - CNN with MNIST dataset test
+- models : saved neural networks models
 
-- CNN_EMNIST_test.py - CNN with EMNIST dataset test
+- networks(package): neural networks classes
 
-- FFNN_MNIST_test.py - Fully Connected with MNIST dataset test
+- results : graphs and other testing results
+  - *.png* - learning results graphs
+  
+  - *.txt* - learning results saved as file
+- other:
+  - test_network(strting file): for testing networks
+  - graphs_shower.py: shows learning graphs
+  - graphs_loader.py: loads data for graphs from file
+  - data_loader.py: loads dataset data 
+  - network_testing.py: testing algorithm
+  - network_training: training algorithm
+  - image_prepare(future file).py: for image preparation
+  - inference_test (future file).py: for inference
+  - create_dataset.py(future file):  for creating datasets
+  
+  
 
-- FF_EMNIST_NN.py - Fully Connected with EMNIST dataset test
 
-- graphs_loader.py - creates graphs from file
-
-- graphs_shower.py - for creation graphs
-
-- *models* - saved learning results as model
-
-  /results - results of learning
-
-- *.png* - learning results graphs
-
-- *.txt* - learning results saved as file

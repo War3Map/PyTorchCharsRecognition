@@ -135,7 +135,7 @@ input_dataset = input("Выберите датасет:")
 dataset = (input_dataset if input_dataset in DATASETS
            else "MNIST")
 
-# функция потерь - логарифмическая функция потерь (log cross entropy loss)
+# функция потерь - логарифмическая функция потерь (negative log cross entropy loss)
 criterion = nn.NLLLoss()
 
 # задаём остальные параметры
