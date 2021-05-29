@@ -14,7 +14,7 @@ import torch.optim as optim
 import graphs_shower
 
 from networks.simple_emnist_cnn import SimpleEmnistConvNet
-from networks.simple_mnist_ffn import SimpleNistFeedForward
+from networks.simple_mnist_ffn import SimpleMnistFeedForward
 
 from network_testing import test_net
 from network_training import train_net
@@ -76,7 +76,7 @@ used_device = torch.device(dev)
 print("Running on Device:{}".format(used_device))
 
 MODELS = {
-    "simple_ffn_mnist": SimpleNistFeedForward,
+    "simple_ffn_mnist": SimpleMnistFeedForward,
     "simple_cnn_emnist": SimpleEmnistConvNet,
 
 }
@@ -134,6 +134,10 @@ input_dataset = input("Выберите датасет:")
 
 dataset = (input_dataset if input_dataset in DATASETS
            else "MNIST")
+
+
+# For Future
+CRITERIONS = {}
 
 # функция потерь - логарифмическая функция потерь (negative log cross entropy loss)
 criterion = nn.NLLLoss()
