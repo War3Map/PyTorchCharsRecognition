@@ -1,7 +1,7 @@
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 
-from base_loader import BaseLoader
+from datasets.base_loader import BaseLoader
 
 
 class EmnistLoader(BaseLoader):
@@ -21,7 +21,7 @@ class EmnistLoader(BaseLoader):
                          batch_size=batch_size,
                          need_resize=False)
 
-    def load(self):
+    def _load(self):
         """
         Load dataset
         :rtype: Tuple[,]
