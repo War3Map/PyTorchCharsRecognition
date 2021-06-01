@@ -14,11 +14,15 @@ import torch.optim as optim
 import graphs_shower
 
 from networks.simple_emnist_cnn import SimpleEmnistConvNet
+from networks.simple_mnist_cnn import SimpleMnistConvNet
+from networks.simple_emnist_ffn import SimpleEmnistFeedForward
 from networks.simple_mnist_ffn import SimpleMnistFeedForward
 
 from network_testing import test_net
 from network_training import train_net
-from data_loaders import DataLoader
+# from data_loaders import DataLoader
+from datasets.emnist_loader import EmnistLoader
+from datasets.mnist_loader import MnistLoader
 
 
 # Сохраняет статистику в файл
@@ -77,7 +81,9 @@ print("Running on Device:{}".format(used_device))
 
 MODELS = {
     "simple_ffn_mnist": SimpleMnistFeedForward,
+    "simple_ffn_emnist": SimpleEmnistFeedForward,
     "simple_cnn_emnist": SimpleEmnistConvNet,
+    "simple_cnn_mnist:": SimpleMnistConvNet,
 
 }
 
@@ -122,19 +128,24 @@ optimizer_name = input_optimizer if input_optimizer in OPTIMIZERS else "SGD"
 optimizer = OPTIMIZERS[optimizer_name]
 
 
-DATASETS = [
-    "MNIST",
-    "EMNIST",
-]
+DATASETS = {
+    "MNIST": MnistLoader,
+    "EMNIST": EmnistLoader,
+}
 
 print("Датасеты")
 for index, dataset in enumerate(DATASETS):
     print(f"{index}. {dataset}")
 input_dataset = input("Выберите датасет:")
 
-dataset = (input_dataset if input_dataset in DATASETS
-           else "MNIST")
+dataset_loader = (DATASETS[input_dataset] if input_dataset in DATASETS
+                  else DATASETS["MNIST"])
 
+
+str_path = input("Путь до датасета(если путь некоректный выбирается по умолчанию):")
+
+dataset_path = (str_path if Path(str_path).exists()
+                else None)
 
 # For Future
 CRITERIONS = {}
@@ -155,7 +166,7 @@ epochs_str = input("Введите число эпох(по умолчанию -
 epochs = int(epochs_str) if epochs_str.isdigit() else 20
 
 # (train_loader,test_loader)
-data_loader = DataLoader(dataset, batch_size=batch_size)
+data_loader = dataset_loader(batch_size, dataset_path)
 train_data, test_data = data_loader.dataset
 # a=5
 # train_loader
