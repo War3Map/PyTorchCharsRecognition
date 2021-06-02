@@ -3,7 +3,7 @@ import torch
 
 def train_net(net, train_loader, optimizer,
               criterion, epochs, device, losses_info,
-              acc_info, train_batch_size, need_resize=True):
+              acc_info, train_batch_size):
     # запускаем главный тренировочный цикл
     # пройдёмся по батчам из наших тестовых наборов
     # каждый проход меняется эпоха
@@ -11,6 +11,7 @@ def train_net(net, train_loader, optimizer,
     correct = 0
     total = 0
     maxbatch_count = len(train_loader.dataset) // train_batch_size
+    need_resize = net.need_resize
 
     for epoch in range(epochs):
         final_loss = 0
@@ -19,6 +20,7 @@ def train_net(net, train_loader, optimizer,
         for batch_id, (data, labels) in enumerate(train_loader):
             data, labels = data.to(device), labels.to(device)
             # # изменим размер с (batch_size, 1, 28, 28) на (batch_size, 28*28)
+
             if need_resize:
                 data = data.view(-1, 28*28)
             # оптимизатор

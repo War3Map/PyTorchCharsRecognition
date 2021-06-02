@@ -1,10 +1,11 @@
 import torch
 
 
-def test_net(net, criterion, test_loader, device, need_resize=True):
+def test_net(net, criterion, test_loader, device):
     # тестирование
     test_loss = 0
     correct = 0
+    need_resize = net.need_resize
 
     with torch.no_grad():
         for data, labels in test_loader:
