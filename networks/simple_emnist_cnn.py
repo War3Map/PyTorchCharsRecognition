@@ -4,7 +4,18 @@ import torch.nn.functional as F
 
 
 # Объявим класс для нашей нейронной сети
+from torch import tensor
+
+
 class SimpleEmnistConvNet(nn.Module):
+    """
+    NN architecture
+
+    Attributes:
+
+    need_resize(bool): if needs to resize input data
+
+    """
     def __init__(self, device):
         super(SimpleEmnistConvNet, self).__init__()
         self.device = device
@@ -24,8 +35,10 @@ class SimpleEmnistConvNet(nn.Module):
         self.fc1 = nn.Linear(3 * 3 * 64, 200).to(device)
         self.fc2 = nn.Linear(200, 200).to(device)
         self.fc3 = nn.Linear(200, 62).to(device)
+        self.need_resize = False
 
     def forward(self, x):
+        # x = x.unsqueeze(1)
         x = self.Conv1(x).to(self.device)
         x = self.Conv2(x).to(self.device)
         x = self.Conv3(x).to(self.device)
@@ -33,8 +46,8 @@ class SimpleEmnistConvNet(nn.Module):
         x = F.relu(self.fc1(x)).to(self.device)
         x = F.relu(self.fc2(x)).to(self.device)
         x = self.fc3(x).to(self.device)
-        return F.log_softmax(x).to(self.device)
+        return F.log_softmax(x, -1).to(self.device)
 
     # вывод архитектуры нейросети
-    def __str__(self):
-        print(self)
+    # def __str__(self):
+    #     print(self)

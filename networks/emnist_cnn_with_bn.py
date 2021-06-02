@@ -4,23 +4,34 @@ import torch.nn.functional as F
 
 
 # Объявим класс для нашей нейронной сети
-class SimpleEmnistConvNet(nn.Module):
+class EmnistConvBnDropNet(nn.Module):
+    """
+    NN architecture
+
+    Attributes:
+
+    need_resize(bool): if needs to resize input data
+
+    """
     def __init__(self, device):
-        super(SimpleEmnistConvNet, self).__init__()
+        super(EmnistConvBnDropNet, self).__init__()
         self.device = device
         # определяем слои нейросети
         self.Conv1 = nn.Sequential(
             nn.Conv2d(1, 16, kernel_size=5, stride=1, padding=2),
+            nn.BatchNorm2d(16),
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2, stride=2),
             nn.Dropout(0.2))
         self.Conv2 = nn.Sequential(
             nn.Conv2d(16, 32, kernel_size=5, stride=1, padding=2),
+            nn.BatchNorm2d(32),
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2, stride=2),
             nn.Dropout(0.2))
         self.Conv3 = nn.Sequential(
             nn.Conv2d(32, 64, kernel_size=5, stride=1, padding=2),
+            nn.BatchNorm2d(64),
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2, stride=2),
             nn.Dropout(0.2))
@@ -28,6 +39,7 @@ class SimpleEmnistConvNet(nn.Module):
             nn.Linear(3 * 3 * 64, 200),
             nn.Dropout(0.5))
         self.fc2 = nn.Linear(200, 62)
+        self.need_resize = False
 
     def forward(self, x):
         x = self.Conv1(x).to(self.device)

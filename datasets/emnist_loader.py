@@ -18,8 +18,7 @@ class EmnistLoader(BaseLoader):
         """
         super().__init__(name="EMNIST",
                          data_path=data_path,
-                         batch_size=batch_size,
-                         need_resize=False)
+                         batch_size=batch_size)
 
     def _load(self):
         """
