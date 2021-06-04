@@ -7,7 +7,7 @@ def train_net(net, train_loader, optimizer,
     # запускаем главный тренировочный цикл
     # пройдёмся по батчам из наших тестовых наборов
     # каждый проход меняется эпоха
-    loss = 0
+    avg_loss = 0
     correct = 0
     total = 0
     maxbatch_count = len(train_loader.dataset) // train_batch_size
@@ -23,6 +23,8 @@ def train_net(net, train_loader, optimizer,
 
             if need_resize:
                 data = data.view(-1, 28*28)
+
+            # print(f"Input shape: {data.shape}")
             # оптимизатор
             # для начала обнулим градиенты перед работой
             optimizer.zero_grad()
@@ -47,10 +49,13 @@ def train_net(net, train_loader, optimizer,
                 _, predicted = torch.max(net_out.data, 1)
                 correct += (predicted == labels).sum().item()
         # вносим текущее значение функции потерь
+        avg_loss += final_loss / batch_count
         losses_info.append(final_loss / batch_count)
         print("Average Loss={}".format(final_loss / batch_count))
         # вносим текущее значение точности распознавания
         acc_info.append(correct / total)
+        print("Accuracy={}".format(correct / total))
 
+    # avg_loss /= len(train_loader.dataset)
     train_acc = float(100. * correct / len(train_loader.dataset))
     return train_acc
