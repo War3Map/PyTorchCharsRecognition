@@ -27,7 +27,8 @@ train_loader = torch.utils.data.DataLoader(
 def show_statictics(train_loader):
     channels_sum, channels_squared_sum, num_batches = 0, 0, 0
 
-    for data, _ in train_loader:
+    for all in train_loader:
+        data, _ = all
         channels_sum += torch.mean(data)
         channels_squared_sum += torch.mean(data ** 2)
         num_batches += 1
