@@ -3,6 +3,7 @@ import os.path
 import time
 from datetime import timedelta
 from pathlib import Path
+from collections import namedtuple
 
 # импорт модулей pytorch
 import torch
@@ -17,6 +18,8 @@ from networks.simple_emnist_cnn import SimpleEmnistConvNet
 from networks.simple_mnist_cnn import SimpleMnistConvNet
 from networks.simple_emnist_ffn import SimpleEmnistFeedForward
 from networks.simple_mnist_ffn import SimpleMnistFeedForward
+from networks.emnist_cnn_with_bn import EmnistConvBnDropNet
+
 
 from network_testing import test_net
 from network_training import train_net
@@ -77,25 +80,28 @@ NETWORK_TYPE = "CNN"
 # Назначаем устройство на котором будет работать нейросеть, по возможности CUDA
 dev = "cuda" if torch.cuda.is_available() else "cpu"
 used_device = torch.device(dev)
-print("Running on Device:{}".format(used_device))
+print(f"Running on Device:{used_device}")
 
+Network_Model = namedtuple("Network_Model", ["name", "init"])
 MODELS = {
-    "simple_ffn_mnist": SimpleMnistFeedForward,
-    "simple_ffn_emnist": SimpleEmnistFeedForward,
-    "simple_cnn_emnist": SimpleEmnistConvNet,
-    "simple_cnn_mnist:": SimpleMnistConvNet,
-
+    "0": Network_Model("simple_ffn_mnist", SimpleMnistFeedForward),
+    "1": Network_Model("simple_ffn_emnist", SimpleEmnistFeedForward),
+    "2": Network_Model("simple_cnn_mnist", SimpleMnistConvNet),
+    "3": Network_Model("simple_cnn_emnist", SimpleEmnistConvNet),
+    "4": Network_Model("emnist_cnn_with_bn", EmnistConvBnDropNet),
 }
 
 # создаём модель
 # передаём вычисления на нужное устройство gpu/cpu
 
 print("Модели")
-for index, model in enumerate(MODELS.keys()):
-    print(f"{index}. {model}")
+for key_index, model in MODELS.items():
+    print(f"{key_index}. {model.name}")
 input_model = input("Выберите модель:")
-chosen_model = (MODELS[input_model] if input_model in MODELS
-                else MODELS["simple_ffn_mnist"])
+model_name, key_model = ((MODELS[input_model].name, input_model)
+                         if input_model in MODELS
+                         else ("simple_ffn_mnist", input_model))
+chosen_model = MODELS[key_model].init
 
 print("Загружаем модель .....")
 net_model = chosen_model(used_device).to(used_device)
@@ -103,10 +109,10 @@ net_model = chosen_model(used_device).to(used_device)
 
 # проверяем есть ли сохранённая модель
 # model_path = r".\models\CNN_EMNIST_model"
-model_path = r".\models\test"
-is_model_exists = os.path.isfile(model_path)
-
-if is_model_exists:
+model_path = Path(r".\models\test") / model_name
+# is_model_exists = os.path.isfile(model_path)
+# print(model_name, model_path)
+if model_path.exists():
     net_model.load_state_dict(torch.load(model_path))
     net_model.eval()
 
@@ -117,35 +123,40 @@ OPTIMIZERS = {
     "Adagrad": optim.Adagrad(net_model.parameters(), lr=learning_rate),
     "Adam": optim.Adam(net_model.parameters(), lr=learning_rate),
     "AdamBetas": optim.Adam(net_model.parameters(), lr=learning_rate, betas=(0.2, 0.01)),
-
 }
 
 print("Оптимизаторы")
 for index, optimizer in enumerate(OPTIMIZERS.keys()):
     print(f"{index}. {optimizer}")
-input_optimizer = input("Выберите оптимизатор:")
+input_optimizer = input("Выберите оптимизатор(по умолчанию SGD):")
 optimizer_name = input_optimizer if input_optimizer in OPTIMIZERS else "SGD"
 optimizer = OPTIMIZERS[optimizer_name]
 
-
+Dataset = namedtuple("Dataset", ["name", "loader", "path"],
+                     defaults=[None, None, None])
 DATASETS = {
-    "MNIST": MnistLoader,
-    "EMNIST": EmnistLoader,
+    "0": Dataset("MNIST", MnistLoader, r"C:\Users\IVAN\Desktop\dataMNIST"),
+    "1": Dataset("EMNIST", EmnistLoader, r"C:\Users\IVAN\Desktop\dataEMNIST")
 }
 
 print("Датасеты")
-for index, dataset in enumerate(DATASETS):
-    print(f"{index}. {dataset}")
-input_dataset = input("Выберите датасет:")
+for key, dataset in DATASETS.items():
+    print(f"{key}. {dataset.name}")
+input_dataset = input("Выберите датасет(по умолчанию MNIST):")
 
-dataset_loader = (DATASETS[input_dataset] if input_dataset in DATASETS
-                  else DATASETS["MNIST"])
+dataset_key = (input_dataset if input_dataset in DATASETS
+               else "0")
+
+dataset_loader = DATASETS[dataset_key].loader
 
 
-str_path = input("Путь до датасета(если путь некоректный выбирается по умолчанию):")
+# str_path = input("Путь до датасета(если путь некоректный выбирается по умолчанию):")
+#
+# dataset_path = (str_path if Path(str_path).exists()
+#                 else r"C:\Users\IVAN\Desktop\dataEMNIST")
 
-dataset_path = (str_path if Path(str_path).exists()
-                else None)
+
+dataset_path = DATASETS[dataset_key].path
 
 # For Future
 CRITERIONS = {}
@@ -164,6 +175,7 @@ learning_rate = float(batch_size) if learning_rate_str.isdigit() else 0.001
 
 epochs_str = input("Введите число эпох(по умолчанию - 20):")
 epochs = int(epochs_str) if epochs_str.isdigit() else 20
+print(f"Выбрано {epochs} эпох.")
 
 # (train_loader,test_loader)
 data_loader = dataset_loader(batch_size, dataset_path)
@@ -190,11 +202,13 @@ avg_test_acc, test_time_str = execute_with_time_measure(
     test_data,
     used_device
 )
-print(f"Точность при тестировании: {avg_test_acc}")
+print(f"Точность при тестировании: {avg_test_acc:.3f} %")
 
-prepared_name = (f"{NETWORK_TYPE}_{dataset}"
+prepared_name = (f"{DATASETS[dataset_key].name}"
                  f"(op={optimizer_name},ep={epochs},"
                  f"acc={avg_test_acc:.3f})")
+
+print(prepared_name)
 save_filepath = "./results" / Path(prepared_name)
 
 # строим график обучения
@@ -206,6 +220,6 @@ time_info = (train_time_str, test_time_str)
 save_stats(acc_list, epoch_losses, time_info,
            str(save_filepath) + ".txt")
 
-if not is_model_exists:
+if model_path.exists():
     torch.save(net_model.state_dict(), model_path)
     print("Model Saved!")
