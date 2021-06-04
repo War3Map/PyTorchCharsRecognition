@@ -18,8 +18,7 @@ class MnistLoader(BaseLoader):
         """
         super().__init__(name="MNIST",
                          data_path=data_path,
-                         batch_size=batch_size,
-                         need_resize=True)
+                         batch_size=batch_size)
 
     def _load(self):
         """
@@ -34,11 +33,11 @@ class MnistLoader(BaseLoader):
             datasets.MNIST(self.data_path, train=True, download=True, transform=transformations),
             batch_size=self.batch_size, shuffle=True, pin_memory=True)
 
-        labels_loader = DataLoader(
+        test_loader = DataLoader(
             datasets.MNIST(self.data_path, train=False, download=False, transform=transformations),
             batch_size=self.batch_size, shuffle=True, pin_memory=True)
 
-        return train_loader, labels_loader
+        return train_loader, test_loader
 
 
 
