@@ -1,7 +1,7 @@
 # стандартные модули
 import os.path
 import time
-from datetime import timedelta
+from datetime import timedelta, datetime
 from pathlib import Path
 from collections import namedtuple
 
@@ -203,6 +203,9 @@ avg_test_acc, test_time_str = execute_with_time_measure(
     used_device
 )
 print(f"Точность при тестировании: {avg_test_acc:.3f} %")
+
+
+# dt_time_stamp = datetime.now()
 
 prepared_name = (f"{DATASETS[dataset_key].name}"
                  f"(op={optimizer_name},ep={epochs},"
