@@ -5,6 +5,7 @@ import cv2
 import numpy as np
 from matplotlib import pyplot as plt
 from mpl_toolkits.axes_grid1 import ImageGrid
+from functools import cmp_to_key
 
 
 def cv_show_image(image, name_of_window):
@@ -87,7 +88,9 @@ thresh_val = thresh_val - 20
 thresh_val = 180
 
 ret, thresh = cv2.threshold(gray, thresh_val, 255, cv2.THRESH_BINARY)
-_, contours, hierarchy = cv2.findContours(thresh, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_TC89_L1)
+img_erode = cv2.erode(thresh, np.ones((3, 3), np.uint8), iterations=1)
+
+_, contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_TC89_L1)
 # img_erode = cv2.erode(cur_image, np.ones((3, 3), np.uint8), iterations=10)
 # img_erode = cv2.dilate(cur_image, np.ones((3, 3), np.uint8), iterations=10)
 # cv2.imshow(f"Source", image)
@@ -113,13 +116,14 @@ for idx, contour in enumerate(contours):
     #
     #         cur_image = image[y:y + h, x:x + w]
     #         detected_objects.append(cur_image)
-    sqr = w * h
-    if sqr > MIN_SQR:
-        cv2.rectangle(output, (x, y), (x + w, y + h), (70, 0, 0), 1)
+    if hierarchy[0][idx][3] == 0:
+        sqr = w * h
+        if sqr > MIN_SQR:
+            cv2.rectangle(img_erode, (x, y), (x + w, y + h), (70, 0, 0), 1)
 
-        cur_image = image[y:y + h, x:x + w]
-        detected_objects.append(cur_image)
-        correct_contours.append(contour)
+            cur_image = image[y:y + h, x:x + w]
+            detected_objects.append(cur_image)
+            correct_contours.append(contour)
     # cv2.imshow(f"Contour{idx}", cur_image)
     # input()
 
@@ -130,13 +134,25 @@ for idx, contour in enumerate(contours):
 # # x + y * w
 
 
+def contour_sort(a, b):
+
+    br_a = cv2.boundingRect(a)
+    br_b = cv2.boundingRect(b)
+
+    if abs(br_a[1] - br_b[1]) <= 15:
+        return br_a[0] - br_b[0]
+
+    return br_a[1] - br_b[1]
+
+
 def get_contour_precedence(contour, cols):
     tolerance_factor = 10
     origin = cv2.boundingRect(contour)
     return ((origin[1] // tolerance_factor) * tolerance_factor) * cols + origin[0]
 
 
-sorted_ctrs = sorted(correct_contours, key=lambda x:get_contour_precedence(x, thresh.shape[1]))
+# sorted_ctrs = sorted(correct_contours, key=lambda x:get_contour_precedence(x, thresh.shape[1]))
+sorted_ctrs = sorted(correct_contours, key=cmp_to_key(contour_sort))
 
 shutil.rmtree(r'.\\contours', ignore_errors=True)
 os.mkdir('contours')
@@ -154,8 +170,9 @@ for idx, ctr in enumerate(sorted_ctrs):
 # cv2.waitKey(0)
 cv_show_image(image, "image")
 # cv_show_image(gray, "gray")
+cv_show_image(img_erode, "thresh_erode")
 # cv_show_image(thresh, "thresh")
-cv_show_image(edged, "edged")
+# cv_show_image(edged, "edged")
 cv_show_image(output, "result")
 
 # cv_show_image(cont_image, "contours")
@@ -163,5 +180,5 @@ cv_show_image(output, "result")
 
 # show_grid(detected_objects)
 
-show_detected(detected_objects)
+show_detected(sorted_images)
 
