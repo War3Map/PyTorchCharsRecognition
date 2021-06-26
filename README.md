@@ -2,11 +2,22 @@
 
 Testing Neural Networks work with PyToch
 
+
 ## Requirements
 
 - PyToch
 - matploitlib
+- opencv(for test)
 
+## Installation torch and opencv
+
+```
+conda install pytorch torchvision torchaudio cudatoolkit=10.2 -c pytorch
+```
+
+```
+conda install -c conda-forge opencv
+```
 
 ## Run
 
